@@ -389,11 +389,49 @@ where
     }
 }
 
+impl<T, A> Volatile<&mut [T], A>
+{
+    /// Splits the Volatile slice at the given index and returns the two Volatile slices.
+    #[cfg(feature = "unstable")]
+    pub fn split_at_mut(mut self, index: usize) -> (Self, Self) {
+        let (a, b) = self.reference.split_at_mut(index);
+        (Volatile {
+            reference: a,
+            access: PhantomData,
+        }, Volatile {
+            reference: b,
+            access: PhantomData,
+        })
+    }
+}
+
+impl<T, A> Volatile<&[T], A>
+{
+    /// Splits the Volatile slice at the given index and returns the two Volatile slices.
+    #[cfg(feature = "unstable")]
+    pub fn split_at(mut self, index: usize) -> (Self, Self) {
+        let (a, b) = self.reference.split_at(index);
+        (Volatile {
+            reference: a,
+            access: PhantomData,
+        }, Volatile {
+            reference: b,
+            access: PhantomData,
+        })
+    }
+}
+
 /// Methods for volatile slices
 impl<T, R, A> Volatile<R, A>
 where
     R: Deref<Target = [T]>,
 {
+    /// Determines the length of the slice
+    #[cfg(feature = "unstable")]
+    pub fn len(&self) -> usize {
+        self.reference.len()
+    }
+
     /// Applies the index operation on the wrapped slice.
     ///
     /// Returns a shared `Volatile` reference to the resulting subslice.
